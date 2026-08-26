@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MISSÃO: HIV — Descubra o que é verdade</title>
+<meta name="description" content="Uma campanha digital interativa de combate à desinformação sobre o HIV.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   MISSÃO: HIV — design tokens
+   ============================================================ */
+:root{
+  --bg:            #0a0c10;
+  --bg-soft:       #0d1015;
+  --panel:         #12161d;
+  --panel-2:       #171c25;
+  --line:          #232a35;
+  --coral:         #ff5c5c;
+  --coral-dim:     #ff5c5c22;
+  --coral-glow:    #ff5c5c55;
+  --blue:          #5b8def;
+  --blue-dim:      #5b8def22;
+  --purple:        #9b6bff;
+  --white:         #f4f6f9;
+  --gray:          #9099ab;
+  --gray-dim:      #5b6474;
+
+  --font-display:  'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
+  --font-body:     'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-mono:     'JetBrains Mono', 'Courier New', monospace;
+
+  --radius:        18px;
+  --radius-sm:     10px;
+  --maxw:          1120px;
+  --nav-h:         64px;
+
+  --dot-color:     rgba(255,255,255,0.045);
+  --topbar-bg:     rgba(10,12,16,0.82);
+}
+
+/* ---------- LIGHT THEME ---------- */
+[data-theme="light"]{
+  --bg:            #f4f5f8;
+  --bg-soft:       #eceef2;
+  --panel:         #ffffff;
+  --panel-2:       #f7f8fb;
+  --line:          #dfe2e8;
+  --coral:         #dd4038;
+  --coral-dim:     #dd40381a;
+  --coral-glow:    #dd403850;
+  --blue:          #3660cf;
+  --blue-dim:      #3660cf1a;
+  --purple:        #6d3fe0;
+  --white:         #14171e;
+  --gray:          #52596a;
+  --gray-dim:      #8b93a3;
+  --dot-color:     rgba(10,12,20,0.05);
+  --topbar-bg:     rgba(255,255,255,0.82);
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  *,*::before,*::after{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--white);
+  font-family:var(--font-body);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  transition:background-color .35s ease, color .35s ease;
+}
+
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  background-image:
+    radial-gradient(circle at 1px 1px, var(--dot-color) 1px, transparent 1px);
+  background-size:34px 34px;
+  pointer-events:none;
+  z-index:0;
+  transition:background-image .35s ease;
+}
+
+img,svg{ display:block; max-width:100%; }
+a{ color:inherit; }
+button{ font-family:inherit; }
+
+.wrap{ max-width:var(--maxw); margin:0 auto; padding:0 28px; position:relative; z-index:1; }
+.eyebrow{
+  font-family:var(--font-mono);
+  font-size:12.5px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--coral);
+  display:flex; align-items:center; gap:10px;
+  margin:0 0 16px;
+}
+.eyebrow::before{
+  content:"";
+  width:7px; height:7px; border-radius:50%;
+  background:var(--coral);
+  box-shadow:0 0 0 4px var(--coral-dim);
+}
+h1,h2,h3{ font-family:var(--font-display); margin:0; font-weight:700; letter-spacing:-0.01em; }
+p{ margin:0; }
+.section{ position:relative; padding:120px 0; border-bottom:1px solid var(--line); transition:border-color .35s ease; }
+.section-head{ max-width:640px; margin-bottom:56px; }
+.section-title{ font-size:clamp(28px,4vw,42px); line-height:1.1; }
+.section-sub{ color:var(--gray); font-size:17px; margin-top:14px; max-width:560px; }
+.visually-hidden{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+
+/* focus visibility */
+a:focus-visible, button:focus-visible, [tabindex]:focus-visible{
+  outline:2px solid var(--coral);
+  outline-offset:3px;
+  border-radius:6px;
+}
+
+/* ============================================================
+   TOP BAR — nav + investigation progress rail
+   ============================================================ */
+.topbar{
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  background:var(--topbar-bg);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+  transition:background-color .35s ease, border-color .35s ease;
+}
+.topbar-inner{
+  max-width:var(--maxw); margin:0 auto; padding:0 28px;
+  height:var(--nav-h);
+  display:flex; align-items:center; justify-content:space-between; gap:24px;
+}
+.brand{
+  display:flex; align-items:center; gap:10px;
+  font-family:var(--font-display); font-weight:700; font-size:15px;
+  letter-spacing:.02em; white-space:nowrap;
+}
+.brand-dot{
+  width:9px; height:9px; border-radius:50%;
+  background:var(--coral);
+  box-shadow:0 0 0 4px var(--coral-dim);
+  animation:pulse-dot 2.2s ease-in-out infinite;
+  flex-shrink:0;
+}
+@keyframes pulse-dot{ 0%,100%{ opacity:1; transform:scale(1);} 50%{ opacity:.55; transform:scale(.8);} }
+
+.nav-right{ display:flex; align-items:center; gap:12px; }
+.navlinks{ display:flex; gap:4px; list-style:none; margin:0; padding:0; }
+.navlinks button{
+  background:none; border:none; color:var(--gray);
+  font-family:var(--font-mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase;
+  padding:9px 13px; border-radius:999px; cursor:pointer;
+  transition:color .2s ease, background .2s ease;
+}
+.navlinks button:hover{ color:var(--white); background:var(--panel-2); }
+.navlinks button.active{ color:var(--coral); background:var(--coral-dim); }
+
+.theme-toggle{
+  width:36px; height:36px; border-radius:50%; flex-shrink:0;
+  border:1px solid var(--line); background:var(--panel); color:var(--gray);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:15px; line-height:1;
+  transition:border-color .2s ease, color .2s ease, background-color .3s ease, transform .2s ease;
+}
+.theme-toggle:hover{ border-color:var(--coral); color:var(--coral); transform:translateY(-1px); }
+.theme-toggle .theme-icon{ display:block; }
+
+.progress-rail{
+  height:1px; position:relative;
+  background:var(--line);
+  transition:background-color .35s ease;
+}
+.progress-rail-fill{
+  position:absolute; top:0; left:0; height:100%;
+  width:0%; background:linear-gradient(90deg,var(--coral),var(--purple));
+  transition:width .25s ease;
+}
+
+@media (max-width:820px){
+  .navlinks button{ font-size:10.5px; padding:7px 9px; }
+  .brand span.brand-label{ display:none; }
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  min-height:100svh;
+  display:flex; align-items:center;
+  padding-top:calc(var(--nav-h) + 40px);
+  position:relative;
+  overflow:hidden;
+  border-bottom:1px solid var(--line);
+}
+.hero::after{
+  content:"";
+  position:absolute; left:50%; top:50%;
+  width:900px; height:900px; margin:-450px 0 0 -450px;
+  background:radial-gradient(circle, var(--coral-dim) 0%, transparent 65%);
+  pointer-events:none;
+}
+.hero-grid{
+  display:grid; grid-template-columns:1.05fr 0.95fr; gap:40px; align-items:center;
+  width:100%;
+}
+.hero-title{
+  font-size:clamp(46px,7.2vw,84px);
+  line-height:0.98;
+  letter-spacing:-0.02em;
+}
+.hero-title span{ color:var(--coral); }
+.hero-lines{ margin-top:26px; font-size:clamp(17px,2vw,20px); color:var(--gray); max-width:460px; }
+.hero-lines em{ font-style:normal; color:var(--white); display:block; }
+.hero-impact{
+  margin-top:22px; font-family:var(--font-mono); font-size:13px;
+  color:var(--gray-dim); letter-spacing:.02em;
+  border-left:2px solid var(--coral); padding-left:12px;
+}
+.cta{
+  margin-top:38px;
+  display:inline-flex; align-items:center; gap:10px;
+  background:var(--coral); color:#1a0505;
+  font-family:var(--font-display); font-weight:700; font-size:15px;
+  padding:16px 26px; border-radius:999px; border:none; cursor:pointer;
+  letter-spacing:.01em;
+  box-shadow:0 12px 30px -10px var(--coral-glow);
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.cta:hover{ transform:translateY(-2px); box-shadow:0 16px 36px -8px var(--coral-glow); }
+.cta svg{ width:16px; height:16px; }
+
+/* hero visual: abstract viral particle */
+.hero-visual{ position:relative; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; }
+.particle-rotate-slow{ animation:spin 46s linear infinite; transform-origin:350px 350px; }
+.ring-line{ stroke:var(--line); transition:stroke .35s ease; }
+.particle-rotate-rev{ animation:spin-rev 34s linear infinite; transform-origin:350px 350px; }
+.particle-rotate-mid{ animation:spin 22s linear infinite; transform-origin:350px 350px; }
+@keyframes spin{ from{ transform:rotate(0deg);} to{ transform:rotate(360deg);} }
+@keyframes spin-rev{ from{ transform:rotate(0deg);} to{ transform:rotate(-360deg);} }
+.particle-core{ animation:corepulse 4.2s ease-in-out infinite; transform-origin:350px 350px; }
+@keyframes corepulse{ 0%,100%{ transform:scale(1); opacity:1;} 50%{ transform:scale(1.07); opacity:.85;} }
+.spike-node{ animation:spikeglow 3s ease-in-out infinite; }
+@keyframes spikeglow{ 0%,100%{ opacity:.55;} 50%{ opacity:1;} }
+
+/* ============================================================
+   CARDS — shared glass style
+   ============================================================ */
+.card{
+  background:linear-gradient(180deg, var(--panel), var(--panel-2));
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:26px;
+  position:relative;
+  transition:border-color .25s ease, transform .25s ease, background .35s ease, color .35s ease;
+}
+.card:hover{ border-color:#333c4a; transform:translateY(-3px); }
+
+/* reveal on scroll */
+.reveal{ opacity:0; transform:translateY(22px); transition:opacity .7s ease, transform .7s ease; }
+.reveal.in{ opacity:1; transform:translateY(0); }
+.reveal-stagger > *{ transition-delay:calc(var(--i,0) * 90ms); }
+
+/* ============================================================
+   EVIDÊNCIA #01 — O QUE É HIV
+   ============================================================ */
+.split{ display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:start; }
+.lede{ font-size:19px; color:var(--white); }
+.lede strong{ color:var(--coral); font-weight:600; }
+.neq{
+  margin-top:22px; font-family:var(--font-mono); font-size:14px; color:var(--gray);
+  display:flex; align-items:center; gap:10px;
+}
+.neq b{ color:var(--white); }
+
+.toggle-card{
+  border-radius:var(--radius); border:1px solid var(--line);
+  background:var(--panel); overflow:hidden;
+  transition:background-color .35s ease, border-color .35s ease;
+}
+.toggle-tabs{ display:flex; border-bottom:1px solid var(--line); }
+.toggle-tabs button{
+  flex:1; padding:16px; background:none; border:none; cursor:pointer;
+  color:var(--gray); font-family:var(--font-display); font-weight:700; font-size:15px;
+  letter-spacing:.02em;
+  border-bottom:2px solid transparent;
+  transition:color .2s ease, border-color .2s ease, background .2s ease;
+}
+.toggle-tabs button.active{ color:var(--coral); border-color:var(--coral); background:var(--coral-dim); }
+.toggle-panels{ padding:22px 24px 26px; min-height:118px; }
+.toggle-panel{ display:none; color:var(--gray); font-size:15px; }
+.toggle-panel.active{ display:block; }
+.toggle-panel b{ color:var(--white); }
+
+.chain{
+  margin-top:34px; display:flex; align-items:center; gap:0; flex-wrap:wrap;
+}
+.chain-step{
+  display:flex; flex-direction:column; align-items:center; gap:10px; width:130px;
+  opacity:0; transform:translateY(14px); transition:opacity .6s ease, transform .6s ease;
+}
+.chain-step.in{ opacity:1; transform:translateY(0); }
+.chain-icon{
+  width:56px; height:56px; border-radius:50%;
+  border:1px solid var(--line); background:var(--panel);
+  display:flex; align-items:center; justify-content:center; font-size:22px;
+}
+.chain-label{ font-family:var(--font-mono); font-size:11.5px; text-align:center; color:var(--gray); letter-spacing:.02em; }
+.chain-arrow{ color:var(--gray-dim); font-size:18px; margin:0 4px 26px; }
+
+/* ============================================================
+   EVIDÊNCIA #02 — TRANSMISSÃO
+   ============================================================ */
+.grid-4{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+.grid-5{ display:grid; grid-template-columns:repeat(5,1fr); gap:14px; }
+
+.t-card{ cursor:pointer; user-select:none; }
+.t-card .t-icon{ font-size:26px; }
+.t-card h3{ font-size:15.5px; margin-top:14px; }
+.t-card p{
+  color:var(--gray); font-size:13.5px; margin-top:10px;
+  max-height:0; overflow:hidden; opacity:0;
+  transition:max-height .35s ease, opacity .35s ease, margin-top .35s ease;
+}
+.t-card.open p{ max-height:140px; opacity:1; }
+.t-card .t-more{
+  margin-top:12px; font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em;
+  color:var(--coral); text-transform:uppercase;
+}
+
+.subhead{
+  font-family:var(--font-mono); font-size:12.5px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--blue); margin:52px 0 20px;
+}
+
+.q-card{
+  aspect-ratio:1/1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; cursor:pointer; gap:8px; padding:14px;
+}
+.q-mark{ font-family:var(--font-display); font-size:26px; color:var(--gray-dim); transition:opacity .2s ease; }
+.q-icon{ font-size:24px; }
+.q-result{ display:none; font-family:var(--font-mono); font-size:11px; color:var(--blue); font-weight:600; letter-spacing:.03em; }
+.q-explain{ display:none; font-size:11.5px; color:var(--gray); line-height:1.4; }
+.q-card.open .q-mark{ display:none; }
+.q-card.open .q-result{ display:block; }
+.q-card.open .q-explain{ display:block; }
+.q-card.open{ border-color:var(--blue); background:linear-gradient(180deg, var(--blue-dim), var(--panel-2)); }
+
+/* ============================================================
+   EVIDÊNCIA #03 — PREVENÇÃO
+   ============================================================ */
+.p-card{ cursor:pointer; }
+.p-card .p-top{ display:flex; align-items:center; justify-content:space-between; }
+.p-card .p-icon{ font-size:26px; }
+.p-card h3{ font-size:16px; margin-top:16px; }
+.p-chevron{ color:var(--gray-dim); font-size:14px; transition:transform .25s ease; }
+.p-card.open .p-chevron{ transform:rotate(180deg); color:var(--coral); }
+.p-card p{
+  color:var(--gray); font-size:13.5px; margin-top:0;
+  max-height:0; overflow:hidden; opacity:0;
+  transition:max-height .35s ease, opacity .35s ease, margin-top .35s ease;
+}
+.p-card.open p{ max-height:160px; opacity:1; margin-top:12px; }
+
+/* ============================================================
+   CADÊ A VACINA
+   ============================================================ */
+.vaccine-box{
+  border-radius:var(--radius); border:1px solid var(--line);
+  background:radial-gradient(circle at 30% 20%, var(--purple)11, var(--panel) 60%);
+  padding:52px 40px; text-align:center; margin-top:56px;
+  position:relative; overflow:hidden;
+}
+.vaccine-q{ font-family:var(--font-display); font-size:clamp(22px,3vw,30px); font-weight:700; }
+.vaccine-btn{
+  margin-top:26px; background:none; border:1px solid var(--purple); color:var(--purple);
+  font-family:var(--font-mono); font-size:13px; letter-spacing:.08em; text-transform:uppercase;
+  padding:13px 24px; border-radius:999px; cursor:pointer;
+  transition:background .2s ease, color .2s ease;
+}
+.vaccine-btn:hover{ background:var(--purple); color:#0a0611; }
+.vaccine-reveal{ display:none; margin-top:30px; }
+.vaccine-reveal.show{ display:block; animation:fadeup .6s ease; }
+@keyframes fadeup{ from{ opacity:0; transform:translateY(14px);} to{ opacity:1; transform:translateY(0);} }
+.vaccine-verdict{
+  font-family:var(--font-display); font-size:clamp(24px,3.4vw,34px); color:var(--coral); font-weight:700;
+}
+.vaccine-body{ color:var(--gray); font-size:15px; max-width:520px; margin:14px auto 0; }
+.mech-compare{
+  display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:30px; text-align:left;
+}
+.mech-col{ background:var(--bg-soft); border:1px solid var(--line); border-radius:var(--radius-sm); padding:18px; }
+.mech-col h4{ font-family:var(--font-mono); font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--gray); margin:0 0 8px; }
+.mech-col p{ font-size:13.5px; color:var(--gray); line-height:1.5; }
+.mech-col.prep h4{ color:var(--blue); }
+.mech-col.vac h4{ color:var(--gray-dim); }
+
+/* ============================================================
+   FAKE OU FATO
+   ============================================================ */
+.ff-header{ display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap; }
+.score-chip{
+  font-family:var(--font-mono); font-size:13px; letter-spacing:.04em;
+  background:var(--panel); border:1px solid var(--line); border-radius:999px;
+  padding:10px 18px; white-space:nowrap;
+}
+.score-chip b{ color:var(--coral); }
+
+.ff-card{ margin-top:18px; padding:26px 28px; }
+.ff-statement{ font-size:17px; font-weight:500; }
+.ff-actions{ display:flex; gap:12px; margin-top:20px; }
+.ff-btn{
+  flex:1; padding:12px; border-radius:var(--radius-sm); cursor:pointer;
+  font-family:var(--font-mono); font-weight:600; font-size:13px; letter-spacing:.06em; text-transform:uppercase;
+  border:1px solid var(--line); background:var(--bg-soft); color:var(--gray);
+  transition:all .2s ease;
+}
+.ff-btn:hover:not(:disabled){ border-color:var(--white); color:var(--white); }
+.ff-btn:disabled{ cursor:default; }
+.ff-btn.pick-fake{ }
+.ff-btn.pick-fato{ }
+.ff-btn.correct-choice{ border-color:var(--blue); background:var(--blue-dim); color:var(--blue); }
+.ff-btn.wrong-choice{ border-color:var(--coral); background:var(--coral-dim); color:var(--coral); }
+.ff-btn.dim{ opacity:.35; }
+.ff-feedback{
+  display:none; margin-top:18px; padding-top:16px; border-top:1px solid var(--line);
+  font-size:14px; color:var(--gray);
+}
+.ff-feedback.show{ display:block; animation:fadeup .4s ease; }
+.ff-tag{ font-family:var(--font-mono); font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; padding:3px 10px; border-radius:999px; margin-right:8px; }
+.ff-tag.is-fake{ background:var(--coral-dim); color:var(--coral); }
+.ff-tag.is-fato{ background:var(--blue-dim); color:var(--blue); }
+
+/* ============================================================
+   U = U
+   ============================================================ */
+.uu-wrap{ text-align:center; }
+.uu-title{ font-family:var(--font-display); font-size:clamp(46px,8vw,90px); font-weight:700; letter-spacing:.02em; }
+.uu-title span{ color:var(--blue); }
+.uu-sub{ font-family:var(--font-mono); font-size:14px; letter-spacing:.1em; color:var(--gray); margin-top:10px; }
+.uu-steps{ display:flex; flex-direction:column; align-items:center; gap:0; margin:48px 0; }
+.uu-step{
+  padding:16px 30px; border:1px solid var(--line); border-radius:999px; background:var(--panel);
+  font-family:var(--font-mono); font-size:13.5px; letter-spacing:.04em; color:var(--gray);
+  opacity:0; transform:translateY(14px); transition:opacity .6s ease, transform .6s ease, border-color .3s ease, color .3s ease;
+}
+.uu-step.in{ opacity:1; transform:translateY(0); }
+.uu-step.final{ color:var(--blue); border-color:var(--blue); background:var(--blue-dim); }
+.uu-arrow-down{ color:var(--gray-dim); font-size:18px; margin:10px 0; opacity:0; transition:opacity .5s ease; }
+.uu-arrow-down.in{ opacity:1; }
+.uu-line{ max-width:560px; margin:0 auto; color:var(--gray); font-size:15px; }
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+.quiz-box{
+  max-width:640px; margin:0 auto; border-radius:var(--radius); border:1px solid var(--line);
+  background:var(--panel); padding:38px 40px; position:relative; overflow:hidden;
+  transition:background-color .35s ease, border-color .35s ease;
+}
+.quiz-meta{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; }
+.quiz-count{ font-family:var(--font-mono); font-size:12px; color:var(--gray); letter-spacing:.05em; }
+.quiz-dots{ display:flex; gap:6px; }
+.quiz-dots span{ width:7px; height:7px; border-radius:50%; background:var(--line); transition:background .2s ease; }
+.quiz-dots span.done{ background:var(--coral); }
+.quiz-q{ font-size:20px; font-family:var(--font-display); font-weight:600; margin-bottom:22px; min-height:56px; }
+.quiz-opts{ display:flex; flex-direction:column; gap:10px; }
+.quiz-opt{
+  text-align:left; padding:14px 16px; border-radius:var(--radius-sm); border:1px solid var(--line);
+  background:var(--bg-soft); color:var(--white); cursor:pointer; font-size:14.5px;
+  display:flex; gap:12px; align-items:center;
+  transition:all .18s ease;
+}
+.quiz-opt .opt-letter{
+  font-family:var(--font-mono); font-size:12px; color:var(--gray-dim); border:1px solid var(--line);
+  width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.quiz-opt:hover:not(:disabled){ border-color:var(--gray-dim); }
+.quiz-opt.correct{ border-color:var(--blue); background:var(--blue-dim); }
+.quiz-opt.correct .opt-letter{ border-color:var(--blue); color:var(--blue); }
+.quiz-opt.wrong{ border-color:var(--coral); background:var(--coral-dim); }
+.quiz-opt.wrong .opt-letter{ border-color:var(--coral); color:var(--coral); }
+.quiz-opt:disabled{ cursor:default; }
+.quiz-next{
+  margin-top:24px; width:100%; padding:14px; border-radius:999px; border:none;
+  background:var(--coral); color:#1a0505; font-family:var(--font-display); font-weight:700; font-size:14.5px;
+  cursor:pointer; opacity:0; pointer-events:none; transition:opacity .25s ease;
+}
+.quiz-next.show{ opacity:1; pointer-events:auto; }
+
+.quiz-result{ display:none; text-align:center; }
+.quiz-result.show{ display:block; animation:fadeup .5s ease; }
+.result-icon{ font-size:52px; }
+.result-title{ font-family:var(--font-display); font-size:26px; font-weight:700; margin-top:14px; }
+.result-msg{ color:var(--gray); font-size:15px; margin-top:10px; }
+.result-score{ font-family:var(--font-mono); font-size:13px; color:var(--gray-dim); margin-top:18px; letter-spacing:.05em; }
+.result-retry{
+  margin-top:26px; background:none; border:1px solid var(--line); color:var(--gray);
+  font-family:var(--font-mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase;
+  padding:11px 20px; border-radius:999px; cursor:pointer;
+}
+.result-retry:hover{ border-color:var(--white); color:var(--white); }
+
+/* ============================================================
+   FONTES
+   ============================================================ */
+.sources{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.source-link{
+  display:block; text-decoration:none; padding:20px 22px; border-radius:var(--radius-sm);
+  border:1px solid var(--line); background:var(--panel);
+  transition:border-color .2s ease, transform .2s ease, background-color .35s ease, color .35s ease;
+}
+.source-link:hover{ border-color:var(--coral); transform:translateY(-2px); }
+.source-link .s-name{ font-family:var(--font-display); font-weight:700; font-size:14.5px; }
+.source-link .s-desc{ color:var(--gray); font-size:12.5px; margin-top:6px; }
+.source-link .s-arrow{ font-family:var(--font-mono); font-size:11px; color:var(--coral); margin-top:12px; display:block; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{ padding:64px 0 90px; text-align:center; }
+.footer-brand{ font-family:var(--font-display); font-weight:700; font-size:17px; }
+.footer-tag{ color:var(--gray-dim); font-size:13px; margin-top:8px; font-family:var(--font-mono); }
+.footer-credits{ margin-top:34px; color:var(--gray); font-size:13.5px; line-height:1.9; }
+.footer-credits b{ display:block; color:var(--white); font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:8px; }
+.footer-room{
+  margin-top:22px; display:inline-block; font-family:var(--font-mono); font-size:11.5px;
+  color:var(--gray-dim); border:1px solid var(--line); padding:6px 14px; border-radius:999px;
+}
+
+/* back to top */
+.totop{
+  position:fixed; right:22px; bottom:22px; z-index:90;
+  width:46px; height:46px; border-radius:50%;
+  background:var(--panel); border:1px solid var(--line); color:var(--gray);
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  opacity:0; transform:translateY(10px); pointer-events:none;
+  transition:opacity .25s ease, transform .25s ease, border-color .2s ease, color .2s ease, background-color .35s ease;
+}
+.totop.show{ opacity:1; transform:translateY(0); pointer-events:auto; }
+.totop:hover{ border-color:var(--coral); color:var(--coral); }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:960px){
+  .hero-grid{ grid-template-columns:1fr; }
+  .hero-visual{ order:-1; max-width:340px; margin:0 auto; }
+  .split{ grid-template-columns:1fr; gap:36px; }
+  .grid-4{ grid-template-columns:repeat(2,1fr); }
+  .grid-5{ grid-template-columns:repeat(3,1fr); }
+  .mech-compare{ grid-template-columns:1fr; }
+  .sources{ grid-template-columns:1fr; }
+  .section{ padding:84px 0; }
+}
+@media (max-width:560px){
+  .wrap{ padding:0 18px; }
+  .grid-5{ grid-template-columns:repeat(2,1fr); }
+  .navlinks{ gap:0; }
+  .navlinks button{ padding:6px 7px; }
+  .quiz-box{ padding:28px 22px; }
+  .vaccine-box{ padding:36px 20px; }
+  .chain{ justify-content:center; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     TOP BAR
+     ============================================================ -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="brand-dot"></span> MISSÃO<span class="brand-label">: HIV</span></div>
+    <div class="nav-right">
+      <ul class="navlinks" role="tablist" aria-label="Navegação da investigação">
+        <li><button data-nav="inicio" class="active">Início</button></li>
+        <li><button data-nav="o-virus">O vírus</button></li>
+        <li><button data-nav="prevencao">Prevenção</button></li>
+        <li><button data-nav="fake-ou-fato">Fake ou fato?</button></li>
+        <li><button data-nav="quiz">Quiz</button></li>
+      </ul>
+      <button class="theme-toggle" id="themeToggle" aria-label="Alternar para tema claro" aria-pressed="false" title="Alternar tema claro/escuro">
+        <span class="theme-icon" aria-hidden="true">🌙</span>
+      </button>
+    </div>
+  </div>
+  <div class="progress-rail"><div class="progress-rail-fill" id="progressFill"></div></div>
+</div>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<header class="hero" id="inicio">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">Investigação em andamento</p>
+      <h1 class="hero-title">MISSÃO:<br><span>HIV</span></h1>
+      <p class="hero-lines">
+        <em>Um vírus.</em>
+        <em>Muitos mitos.</em>
+        <em>Uma missão: descobrir o que a ciência realmente diz.</em>
+      </p>
+      <button class="cta" id="startBtn">
+        Começar a investigação
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+      <p class="hero-impact">“Informação protege. Desinformação coloca em risco.”</p>
+    </div>
+
+    <div class="hero-visual" aria-hidden="true">
+      <svg viewBox="0 0 700 700" width="100%">
+        <defs>
+          <radialGradient id="coreGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ff8f8f"/>
+            <stop offset="60%" stop-color="#ff5c5c"/>
+            <stop offset="100%" stop-color="#7a1f1f"/>
+          </radialGradient>
+        </defs>
+
+        <g class="particle-rotate-slow">
+          <circle class="ring-line" cx="350" cy="350" r="260" fill="none" stroke-width="1.4" stroke-dasharray="2 10"/>
+        </g>
+
+        <g class="particle-rotate-rev">
+          <polygon points="350,140 470,215 470,360 350,435 230,360 230,215"
+            fill="none" stroke="#5b8def" stroke-opacity="0.45" stroke-width="1.3"/>
+          <circle class="spike-node" cx="350" cy="140" r="7" fill="#5b8def"/>
+          <circle class="spike-node" cx="470" cy="215" r="7" fill="#9b6bff"/>
+          <circle class="spike-node" cx="470" cy="360" r="7" fill="#5b8def"/>
+          <circle class="spike-node" cx="350" cy="435" r="7" fill="#9b6bff"/>
+          <circle class="spike-node" cx="230" cy="360" r="7" fill="#5b8def"/>
+          <circle class="spike-node" cx="230" cy="215" r="7" fill="#9b6bff"/>
+        </g>
+
+        <g class="particle-rotate-mid">
+          <polygon points="350,205 425,275 460,350 425,425 350,495 275,425 240,350 275,275"
+            fill="none" stroke="#ff5c5c" stroke-opacity="0.35" stroke-width="1.1"/>
+        </g>
+
+        <circle class="particle-core" cx="350" cy="350" r="70" fill="url(#coreGrad)"/>
+        <circle cx="350" cy="350" r="70" fill="none" stroke="#ff5c5c" stroke-opacity=".5" stroke-width="1"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ============================================================
+     EVIDÊNCIA #01 — O QUE É HIV
+     ============================================================ -->
+<section class="section" id="o-virus">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Evidência #01</p>
+      <h2 class="section-title">O que é HIV?</h2>
+    </div>
+
+    <div class="split">
+      <div class="reveal">
+        <p class="lede">O HIV é o <strong>Vírus da Imunodeficiência Humana</strong>. Ele ataca principalmente os linfócitos T CD4 — células do sistema imunológico que ajudam o corpo a combater infecções.</p>
+        <div class="neq"><b>HIV</b> ≠ <b>aids</b> — não são a mesma coisa. Veja a diferença ao lado.</div>
+
+        <div class="chain">
+          <div class="chain-step" data-i="0"><div class="chain-icon">🧬</div><div class="chain-label">HIV entra<br>no corpo</div></div>
+          <div class="chain-arrow">→</div>
+          <div class="chain-step" data-i="1"><div class="chain-icon">🛡️</div><div class="chain-label">Infecta a<br>célula CD4</div></div>
+          <div class="chain-arrow">→</div>
+          <div class="chain-step" data-i="2"><div class="chain-icon">🔁</div><div class="chain-label">Vírus se<br>multiplica</div></div>
+          <div class="chain-arrow">→</div>
+          <div class="chain-step" data-i="3"><div class="chain-icon">📉</div><div class="chain-label">Defesa fica<br>enfraquecida</div></div>
+        </div>
+      </div>
+
+      <div class="toggle-card reveal">
+        <div class="toggle-tabs" role="tablist">
+          <button class="active" data-tab="hiv">HIV</button>
+          <button data-tab="aids">AIDS</button>
+        </div>
+        <div class="toggle-panels">
+          <div class="toggle-panel active" data-panel="hiv">
+            <p><b>É o vírus.</b> Infecta células de defesa (linfócitos T CD4) e, sem tratamento, reduz progressivamente a capacidade do organismo de combater infecções.</p>
+          </div>
+          <div class="toggle-panel" data-panel="aids">
+            <p><b>É a síndrome</b> que pode surgir em estágios avançados da infecção, quando o sistema imunológico está gravemente comprometido. Com diagnóstico e tratamento adequados, a maioria das pessoas com HIV nunca chega a esse estágio.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVIDÊNCIA 02 — TRANSMISSÃO -->
+    <p class="subhead reveal" style="margin-top:96px;">Evidência #02 — Como o HIV é transmitido?</p>
+    <div class="grid-4">
+      <div class="card t-card reveal" data-i="0" tabindex="0" role="button" aria-expanded="false">
+        <div class="t-icon">🩸</div><h3>Sangue</h3>
+        <span class="t-more">Toque para saber mais</span>
+        <p>Contato com sangue contaminado, como no compartilhamento de agulhas e seringas.</p>
+      </div>
+      <div class="card t-card reveal" data-i="1" tabindex="0" role="button" aria-expanded="false">
+        <div class="t-icon">❤️</div><h3>Relações sexuais</h3>
+        <span class="t-more">Toque para saber mais</span>
+        <p>Relações sexuais sem proteção (camisinha) podem transmitir o HIV.</p>
+      </div>
+      <div class="card t-card reveal" data-i="2" tabindex="0" role="button" aria-expanded="false">
+        <div class="t-icon">👶</div><h3>Transmissão vertical</h3>
+        <span class="t-more">Toque para saber mais</span>
+        <p>Pode ocorrer da mãe para o bebê durante a gestação, o parto ou a amamentação — por isso o pré-natal com testagem é essencial.</p>
+      </div>
+      <div class="card t-card reveal" data-i="3" tabindex="0" role="button" aria-expanded="false">
+        <div class="t-icon">🧪</div><h3>Outras exposições</h3>
+        <span class="t-more">Toque para saber mais</span>
+        <p>Contato com fluidos corporais capazes de transmitir o vírus em situações específicas, como acidentes com material perfurocortante.</p>
+      </div>
+    </div>
+
+    <p class="subhead reveal">E o que NÃO transmite?</p>
+    <div class="grid-5">
+      <div class="card q-card reveal" data-i="0" tabindex="0" role="button" aria-expanded="false" data-explain="O HIV não sobrevive fora do corpo nem passa pelo contato da pele.">
+        <div class="q-icon">🤝</div><div class="q-mark">?</div>
+        <div class="q-result">❌ NÃO TRANSMITE</div>
+        <div class="q-explain">O HIV não sobrevive fora do corpo nem passa pelo contato da pele.</div>
+      </div>
+      <div class="card q-card reveal" data-i="1" tabindex="0" role="button" aria-expanded="false">
+        <div class="q-icon">🍽️</div><div class="q-mark">?</div>
+        <div class="q-result">❌ NÃO TRANSMITE</div>
+        <div class="q-explain">Não há transmissão por talheres, copos ou pratos compartilhados.</div>
+      </div>
+      <div class="card q-card reveal" data-i="2" tabindex="0" role="button" aria-expanded="false">
+        <div class="q-icon">🚽</div><div class="q-mark">?</div>
+        <div class="q-result">❌ NÃO TRANSMITE</div>
+        <div class="q-explain">O vírus não se transmite por superfícies, vasos sanitários ou objetos do dia a dia.</div>
+      </div>
+      <div class="card q-card reveal" data-i="3" tabindex="0" role="button" aria-expanded="false">
+        <div class="q-icon">🤧</div><div class="q-mark">?</div>
+        <div class="q-result">❌ NÃO TRANSMITE</div>
+        <div class="q-explain">O HIV não é transmitido pelo ar, como um resfriado ou uma gripe.</div>
+      </div>
+      <div class="card q-card reveal" data-i="4" tabindex="0" role="button" aria-expanded="false">
+        <div class="q-icon">🦟</div><div class="q-mark">?</div>
+        <div class="q-result">❌ NÃO TRANSMITE</div>
+        <div class="q-explain">O mosquito não transmite HIV: o vírus não sobrevive nem se multiplica dentro dele.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     EVIDÊNCIA #03 — PREVENÇÃO
+     ============================================================ -->
+<section class="section" id="prevencao">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Evidência #03</p>
+      <h2 class="section-title">Como se prevenir?</h2>
+      <p class="section-sub">Quatro estratégias comprovadas cientificamente. Toque em cada card para entender como agem.</p>
+    </div>
+
+    <div class="grid-4">
+      <div class="card p-card reveal" data-i="0" tabindex="0" role="button" aria-expanded="false">
+        <div class="p-top"><div class="p-icon">🛡️</div><div class="p-chevron">▾</div></div>
+        <h3>Camisinha</h3>
+        <p>Ajuda a prevenir o HIV e outras ISTs. É o único método de barreira acessível para uso antes e durante a relação sexual.</p>
+      </div>
+      <div class="card p-card reveal" data-i="1" tabindex="0" role="button" aria-expanded="false">
+        <div class="p-top"><div class="p-icon">💊</div><div class="p-chevron">▾</div></div>
+        <h3>PrEP</h3>
+        <p>Medicamento usado antes de uma possível exposição ao HIV, para reduzir o risco de infecção. Indicado para pessoas em maior vulnerabilidade.</p>
+      </div>
+      <div class="card p-card reveal" data-i="2" tabindex="0" role="button" aria-expanded="false">
+        <div class="p-top"><div class="p-icon">🚨</div><div class="p-chevron">▾</div></div>
+        <h3>PEP</h3>
+        <p>Medida de emergência após uma possível exposição. Deve ser iniciada o mais rápido possível, no máximo em até 72 horas.</p>
+      </div>
+      <div class="card p-card reveal" data-i="3" tabindex="0" role="button" aria-expanded="false">
+        <div class="p-top"><div class="p-icon">🧪</div><div class="p-chevron">▾</div></div>
+        <h3>Testagem</h3>
+        <p>A única forma de saber se houve infecção é realizando um teste adequado. Testar é um ato de cuidado, não de medo.</p>
+      </div>
+    </div>
+
+    <!-- CADÊ A VACINA -->
+    <div class="vaccine-box reveal">
+      <div id="vaccineQ">
+        <div style="font-size:34px;">💉</div>
+        <p class="vaccine-q" style="margin-top:14px;">Cadê a vacina contra o HIV?</p>
+        <button class="vaccine-btn" id="vaccineBtn">Descobrir</button>
+      </div>
+      <div class="vaccine-reveal" id="vaccineReveal">
+        <p class="vaccine-verdict">Ela ainda não existe.</p>
+        <p class="vaccine-body">Atualmente não existe uma vacina aprovada contra o HIV. Por isso, a prevenção atual utiliza estratégias como camisinha, PrEP, PEP e testagem.</p>
+        <div class="mech-compare">
+          <div class="mech-col vac">
+            <h4>Como uma vacina age</h4>
+            <p>Estimula o sistema imunológico a criar uma resposta de memória, preparando o corpo para reconhecer o agente antes de uma exposição real.</p>
+          </div>
+          <div class="mech-col prep">
+            <h4>Como PrEP e PEP agem</h4>
+            <p>Funcionam de outra maneira: usam medicamentos antirretrovirais para dificultar que o HIV estabeleça a infecção — não criam memória imunológica.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     EVIDÊNCIA #04 — FAKE OU FATO
+     ============================================================ -->
+<section class="section" id="fake-ou-fato">
+  <div class="wrap">
+    <div class="ff-header reveal">
+      <div class="section-head" style="margin-bottom:0;">
+        <p class="eyebrow">Evidência #04</p>
+        <h2 class="section-title">Fake ou fato?</h2>
+        <p class="section-sub">Você consegue identificar uma mentira sobre HIV?</p>
+      </div>
+      <div class="score-chip">FAKES DESMASCARADAS: <b id="ffScore">0</b>/4</div>
+    </div>
+
+    <div id="ffList"></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     U = U
+     ============================================================ -->
+<section class="section" id="uu">
+  <div class="wrap uu-wrap">
+    <p class="eyebrow" style="justify-content:center;">Conclusão da evidência #04</p>
+    <h2 class="uu-title reveal">U <span>=</span> U</h2>
+    <p class="uu-sub">Indetectável = Intransmissível</p>
+
+    <div class="uu-steps">
+      <div class="uu-step" data-i="0">Tratamento</div>
+      <div class="uu-arrow-down" data-i="0">↓</div>
+      <div class="uu-step" data-i="1">Carga viral indetectável</div>
+      <div class="uu-arrow-down" data-i="1">↓</div>
+      <div class="uu-step final" data-i="2">Não há transmissão sexual do HIV</div>
+    </div>
+
+    <p class="uu-line">Quando uma pessoa vivendo com HIV faz o tratamento corretamente e mantém a carga viral indetectável, ela não transmite o HIV sexualmente.</p>
+  </div>
+</section>
+
+<!-- ============================================================
+     QUIZ — DESAFIO FINAL
+     ============================================================ -->
+<section class="section" id="quiz">
+  <div class="wrap">
+    <div class="section-head reveal" style="margin:0 auto 48px; text-align:center;">
+      <p class="eyebrow" style="justify-content:center;">Desafio final</p>
+      <h2 class="section-title">Feche o caso.</h2>
+      <p class="section-sub" style="margin-left:auto; margin-right:auto;">Quatro perguntas para confirmar sua investigação.</p>
+    </div>
+
+    <div class="quiz-box reveal">
+      <div id="quizPlay">
+        <div class="quiz-meta">
+          <span class="quiz-count" id="quizCount">Pergunta 1 de 4</span>
+          <div class="quiz-dots" id="quizDots"></div>
+        </div>
+        <p class="quiz-q" id="quizQ"></p>
+        <div class="quiz-opts" id="quizOpts"></div>
+        <button class="quiz-next" id="quizNext">Próxima →</button>
+      </div>
+
+      <div class="quiz-result" id="quizResult">
+        <div class="result-icon" id="resultIcon"></div>
+        <p class="result-title" id="resultTitle"></p>
+        <p class="result-msg" id="resultMsg"></p>
+        <p class="result-score" id="resultScore"></p>
+        <button class="result-retry" id="retryBtn">↻ Refazer investigação</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FONTES
+     ============================================================ -->
+<section class="section" id="fontes" style="padding-bottom:80px;">
+  <div class="wrap">
+    <p class="eyebrow reveal">Fontes científicas</p>
+    <div class="sources reveal">
+      <a class="source-link" href="https://www.who.int/health-topics/hiv-aids" target="_blank" rel="noopener">
+        <span class="s-name">OMS / WHO</span>
+        <span class="s-desc">Informações globais sobre HIV, transmissão, prevenção e tratamento.</span>
+        <span class="s-arrow">who.int ↗</span>
+      </a>
+      <a class="source-link" href="https://www.unaids.org/en" target="_blank" rel="noopener">
+        <span class="s-name">UNAIDS</span>
+        <span class="s-desc">Dados sobre HIV, desinformação, estigma e a evidência U=U.</span>
+        <span class="s-arrow">unaids.org ↗</span>
+      </a>
+      <a class="source-link" href="https://www.gov.br/aids/pt-br" target="_blank" rel="noopener">
+        <span class="s-name">Ministério da Saúde</span>
+        <span class="s-desc">Informações oficiais sobre PrEP, PEP e prevenção do HIV no Brasil.</span>
+        <span class="s-arrow">gov.br/aids ↗</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-brand">MISSÃO: HIV</div>
+    <div class="footer-tag">Informação baseada em fontes científicas.</div>
+    <div class="footer-credits">
+      <b>Feito por</b>
+      Ariel dos Santos · Leonardo Oliveira · Renato Henrique
+    </div>
+    <div class="footer-room">SALA: 2MIN</div>
+  </div>
+</footer>
+
+<button class="totop" id="totop" aria-label="Voltar ao topo">↑</button>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- helpers ---------- */
+  const $  = (s, ctx) => (ctx||document).querySelector(s);
+  const $$ = (s, ctx) => Array.from((ctx||document).querySelectorAll(s));
+
+  /* ---------- theme toggle (claro / escuro) ---------- */
+  const THEME_KEY = "missao-hiv-theme";
+  const themeToggle = $("#themeToggle");
+  const themeIcon = $(".theme-icon", themeToggle);
+
+  function applyTheme(theme){
+    if(theme === "light"){
+      document.documentElement.setAttribute("data-theme", "light");
+      themeIcon.textContent = "☀️";
+      themeToggle.setAttribute("aria-pressed", "true");
+      themeToggle.setAttribute("aria-label", "Alternar para tema escuro");
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+      themeIcon.textContent = "🌙";
+      themeToggle.setAttribute("aria-pressed", "false");
+      themeToggle.setAttribute("aria-label", "Alternar para tema claro");
+    }
+  }
+
+  let savedTheme = null;
+  try{ savedTheme = localStorage.getItem(THEME_KEY); }catch(e){ /* armazenamento indisponível */ }
+  applyTheme(savedTheme === "light" ? "light" : "dark");
+
+  themeToggle.addEventListener("click", () => {
+    const isLight = document.documentElement.getAttribute("data-theme") === "light";
+    const next = isLight ? "dark" : "light";
+    applyTheme(next);
+    try{ localStorage.setItem(THEME_KEY, next); }catch(e){ /* armazenamento indisponível */ }
+  });
+
+  /* ---------- smooth nav ---------- */
+  const sections = ["inicio","o-virus","prevencao","fake-ou-fato","quiz"];
+  const navBtns = $$(".navlinks button");
+  function goTo(id){
+    const el = document.getElementById(id);
+    if(!el) return;
+    const y = el.getBoundingClientRect().top + window.pageYOffset - (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 64) + 1;
+    window.scrollTo({top:y, behavior:"smooth"});
+  }
+  navBtns.forEach(b => b.addEventListener("click", () => goTo(b.dataset.nav)));
+  $("#startBtn").addEventListener("click", () => goTo("o-virus"));
+
+  /* ---------- scroll reveal ---------- */
+  const revealEls = $$(".reveal, .chain-step, .uu-step, .uu-arrow-down");
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add("in"); revealObserver.unobserve(e.target); } });
+  }, {threshold:0.18});
+  revealEls.forEach((el,i) => { el.style.setProperty("--i", i%6); revealObserver.observe(el); });
+
+  /* ---------- progress rail + active nav (cumulative) ---------- */
+  const progressFill = $("#progressFill");
+  const visited = new Set();
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        visited.add(e.target.id);
+        navBtns.forEach(b => b.classList.toggle("active", b.dataset.nav === e.target.id));
+      }
+    });
+    const pct = (visited.size / sections.length) * 100;
+    progressFill.style.width = pct + "%";
+  }, {threshold:0.4, rootMargin:"-64px 0px -30% 0px"});
+  sections.forEach(id => { const el = document.getElementById(id); if(el) sectionObserver.observe(el); });
+
+  /* ---------- back to top ---------- */
+  const totop = $("#totop");
+  window.addEventListener("scroll", () => {
+    totop.classList.toggle("show", window.scrollY > 700);
+  }, {passive:true});
+  totop.addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
+
+  /* ---------- HIV / AIDS toggle ---------- */
+  $$(".toggle-tabs button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      $$(".toggle-tabs button").forEach(b => b.classList.remove("active"));
+      $$(".toggle-panel").forEach(p => p.classList.remove("active"));
+      btn.classList.add("active");
+      $(`.toggle-panel[data-panel="${btn.dataset.tab}"]`).classList.add("active");
+    });
+  });
+
+  /* ---------- transmission cards (t-card) ---------- */
+  function bindToggleCard(selector){
+    $$(selector).forEach(card => {
+      const toggle = () => {
+        const open = card.classList.toggle("open");
+        card.setAttribute("aria-expanded", open ? "true":"false");
+      };
+      card.addEventListener("click", toggle);
+      card.addEventListener("keydown", (e) => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); toggle(); } });
+    });
+  }
+  bindToggleCard(".t-card");
+  bindToggleCard(".p-card");
+  bindToggleCard(".q-card");
+
+  /* ---------- cadê a vacina ---------- */
+  $("#vaccineBtn").addEventListener("click", () => {
+    $("#vaccineReveal").classList.add("show");
+    $("#vaccineBtn").disabled = true;
+    $("#vaccineBtn").style.opacity = ".4";
+  });
+
+  /* ---------- FAKE OU FATO ---------- */
+  const ffData = [
+    { statement:"Abraçar uma pessoa vivendo com HIV transmite o vírus.", answer:"fake",
+      explain:"O HIV não é transmitido por abraços, apertos de mão ou convivência cotidiana." },
+    { statement:"Mosquito pode transmitir HIV.", answer:"fake",
+      explain:"Mosquitos não transmitem HIV." },
+    { statement:"É possível saber se uma pessoa tem HIV apenas olhando para ela.", answer:"fake",
+      explain:"A pessoa pode não apresentar sintomas. A confirmação depende de testagem." },
+    { statement:"Uma pessoa com HIV em tratamento e com carga viral indetectável não transmite o HIV sexualmente.", answer:"fato",
+      explain:"U = U: Indetectável = Intransmissível." }
+  ];
+  let ffScore = 0;
+  const ffList = $("#ffList");
+  ffData.forEach((item, idx) => {
+    const card = document.createElement("div");
+    card.className = "card ff-card reveal";
+    card.innerHTML = `
+      <p class="ff-statement">${item.statement}</p>
+      <div class="ff-actions">
+        <button class="ff-btn pick-fake" data-choice="fake">Fake</button>
+        <button class="ff-btn pick-fato" data-choice="fato">Fato</button>
+      </div>
+      <div class="ff-feedback">
+        <span class="ff-tag ${item.answer === 'fake' ? 'is-fake':'is-fato'}">${item.answer === 'fake' ? 'Fake' : 'Fato'}</span>
+        ${item.explain}
+      </div>`;
+    ffList.appendChild(card);
+    revealObserver.observe(card);
+
+    const btns = $$(".ff-btn", card);
+    btns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const choice = btn.dataset.choice;
+        btns.forEach(b => b.disabled = true);
+        if(choice === item.answer){
+          btn.classList.add("correct-choice");
+          ffScore++;
+        } else {
+          btn.classList.add("wrong-choice");
+          btns.forEach(b => { if(b.dataset.choice === item.answer) b.classList.add("correct-choice"); });
+        }
+        btns.forEach(b => { if(b !== btn && b.dataset.choice !== item.answer) b.classList.add("dim"); });
+        $(".ff-feedback", card).classList.add("show");
+        $("#ffScore").textContent = ffScore;
+      });
+    });
+  });
+
+  /* ---------- QUIZ ---------- */
+  const quizData = [
+    { q:"Qual célula é um dos principais alvos do HIV?",
+      opts:["Hemácias","Linfócitos T CD4","Plaquetas"], correct:1 },
+    { q:"Existe atualmente uma vacina aprovada contra o HIV?",
+      opts:["Sim","Não"], correct:1 },
+    { q:"PrEP é usada principalmente:",
+      opts:["Antes de uma possível exposição","Depois de uma possível exposição","Como vacina"], correct:0 },
+    { q:"O que significa U = U?",
+      opts:["Um vírus = uma vacina","Indetectável = Intransmissível","Uso = obrigatório"], correct:1 }
+  ];
+  let qIndex = 0, qScore = 0, qAnswered = false;
+  const quizQ = $("#quizQ"), quizOpts = $("#quizOpts"), quizNext = $("#quizNext");
+  const quizCount = $("#quizCount"), quizDots = $("#quizDots");
+
+  quizData.forEach(() => { const d = document.createElement("span"); quizDots.appendChild(d); });
+
+  function renderQuiz(){
+    qAnswered = false;
+    const item = quizData[qIndex];
+    quizCount.textContent = `Pergunta ${qIndex+1} de ${quizData.length}`;
+    quizQ.textContent = item.q;
+    quizOpts.innerHTML = "";
+    quizNext.classList.remove("show");
+    quizNext.textContent = (qIndex === quizData.length - 1) ? "Ver resultado →" : "Próxima →";
+
+    item.opts.forEach((opt, i) => {
+      const b = document.createElement("button");
+      b.className = "quiz-opt";
+      b.innerHTML = `<span class="opt-letter">${String.fromCharCode(65+i)}</span><span>${opt}</span>`;
+      b.addEventListener("click", () => {
+        if(qAnswered) return;
+        qAnswered = true;
+        const correctIdx = item.correct;
+        $$(".quiz-opt", quizOpts).forEach((el, j) => {
+          el.disabled = true;
+          if(j === correctIdx) el.classList.add("correct");
+        });
+        if(i !== correctIdx) b.classList.add("wrong"); else qScore++;
+        quizNext.classList.add("show");
+      });
+      quizOpts.appendChild(b);
+    });
+  }
+
+  quizNext.addEventListener("click", () => {
+    if(qIndex < quizData.length - 1){
+      qIndex++;
+      $$("#quizDots span")[qIndex-1].classList.add("done");
+      renderQuiz();
+    } else {
+      $$("#quizDots span")[qIndex].classList.add("done");
+      showResult();
+    }
+  });
+
+  function showResult(){
+    $("#quizPlay").style.display = "none";
+    const result = $("#quizResult");
+    result.classList.add("show");
+    let icon, title, msg;
+    if(qScore === 4){ icon="🧠"; title="Investigação concluída"; msg="Você separou ciência de desinformação."; }
+    else if(qScore === 3){ icon="🔬"; title="Quase lá"; msg="Você já sabe bastante, mas ainda existem alguns mitos para revisar."; }
+    else { icon="🚨"; title="Alerta de fake news"; msg="Hora de revisar as evidências."; }
+    $("#resultIcon").textContent = icon;
+    $("#resultTitle").textContent = title;
+    $("#resultMsg").textContent = msg;
+    $("#resultScore").textContent = `PONTUAÇÃO: ${qScore}/4`;
+  }
+
+  $("#retryBtn").addEventListener("click", () => {
+    qIndex = 0; qScore = 0;
+    $$("#quizDots span").forEach(d => d.classList.remove("done"));
+    $("#quizResult").classList.remove("show");
+    $("#quizPlay").style.display = "";
+    renderQuiz();
+  });
+
+  renderQuiz();
+})();
+</script>
+</body>
+</html>
